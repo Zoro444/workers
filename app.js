@@ -53,7 +53,7 @@ class WorkerThreads {
               j = -1;
               j++;
             }
-            filesForThread[j].push(path.join(path.resolve(), csvFiles[i]));         
+            filesForThread[j].push(path.join(path.resolve(),'csv-files', csvFiles[i]));         
           }
             
           for (let i = 0; i < countCPUs; i++) {
