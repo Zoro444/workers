@@ -89,9 +89,7 @@ class WorkerThreads {
     }
 }
 
-
 const workerInstance = new WorkerThreads();
-
 const csvFilesName = workerInstance.getCsvFiles('./csv-files');
 
 csvFilesName
