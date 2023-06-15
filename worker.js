@@ -2,8 +2,7 @@ import threads, { parentPort } from "worker_threads";
 import path from "path";
 import fs from "fs";
 import csv from "csv-parser";
-
-export default class ReadAndWriteFile{
+ class ReadAndWriteFile{
   readFile(file) {
     return new Promise((resolve, reject) => {
       try {

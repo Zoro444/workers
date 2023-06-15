@@ -4,11 +4,14 @@ import path from "path";
 import os from "os";
 
 let csvFiles ;
-const countCPUs = os.cpus().length;
+let countCPUs = os.cpus().length;
 const totalInfo = [];
 let activeWorkers = 0;
 
-class WorkerThreads {
+//To use the code, import the "WorkerThreads" class into your code, create an instance,
+// and call the start(<csv directory path>) method.
+export default class WorkerThreads {
+   
     getCsvFiles(dirPath) {
       return new Promise((resolve, reject) => {
         fs.promises.stat(dirPath)
@@ -48,6 +51,10 @@ class WorkerThreads {
     createThreads(csvFiles) {
       return new Promise((resolve, reject) => {
         try {
+          let workersCount = 0;
+          if (countCPUs > csvFiles.length) {
+            countCPUs = csvFiles.length;
+          }
           let filesForThread = Array.from({length: countCPUs}, () => []);
           let threads = [];
           for(let i = 0, j = 0; i < csvFiles.length; i++, j++){
@@ -87,35 +94,46 @@ class WorkerThreads {
             reject(err);
         }
       })
+
+    }
+
+    start(csvFilePath) {
+        return new Promise((resolve, reject) => {
+            const workerInstance = new WorkerThreads();
+            const csvFilesName = workerInstance.getCsvFiles(csvFilePath);
+            
+            csvFilesName
+              .then((data) => {
+                 csvFiles = data;
+                 workerInstance.createDirectory('csv-files/converted');
+                 workerInstance.createThreads(csvFiles)
+                   .then((data) => {
+                     workerInstance.sendFilesToThreads(data);
+                     data.threads.forEach((thread) => {
+                      thread.on('message', (info) => {
+                        totalInfo.push(info);
+                        activeWorkers--;
+                        if (activeWorkers === 0) {
+                          totalInfo.forEach((item) => {
+                            console.table(item)
+                            resolve(totalInfo);
+                          })
+                        }
+                      })
+                     })
+                   })
+                   .catch((err) => {
+                    reject(err)
+                    })
+              })
+              .catch((err) => {
+                reject(err)
+               })
+        })
+       
     }
 }
 
+//test
 const workerInstance = new WorkerThreads();
-const csvFilesName = workerInstance.getCsvFiles('./csv-files');
-
-csvFilesName
-  .then((data) => {
-     csvFiles = data;
-     workerInstance.createDirectory('csv-files/converted');
-     workerInstance.createThreads(csvFiles)
-       .then((data) => {
-         workerInstance.sendFilesToThreads(data);
-         data.threads.forEach((thread) => {
-          thread.on('message', (info) => {
-            totalInfo.push(info);
-            activeWorkers--;
-            if (activeWorkers === 0) {
-              totalInfo.forEach((item) => {
-                console.table(item)
-              })
-            }
-          })
-         })
-       })
-       .catch((err) => {
-          console.log(err);
-        })
-  })
-  .catch((err) => {
-     console.log(err);
-   })
+workerInstance.start('csv-files')
