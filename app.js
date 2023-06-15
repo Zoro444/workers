@@ -106,9 +106,8 @@ csvFilesName
             totalInfo.push(info);
             activeWorkers--;
             if (activeWorkers === 0) {
-              console.table(totalInfo);
               totalInfo.forEach((item) => {
-                console.table(item.files)
+                console.table(item)
               })
             }
           })

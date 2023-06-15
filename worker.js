@@ -1,4 +1,4 @@
-import { parentPort } from "worker_threads";
+import threads, { parentPort } from "worker_threads";
 import path from "path";
 import fs from "fs";
 import csv from "csv-parser";
@@ -43,8 +43,9 @@ export default class ReadAndWriteFile{
         readablyStream.on('close', () => {
           resolve({
             fileName: path.basename(file),
-            duration,
-            records
+            duration: duration + " ms",
+            records: records + " lines",
+            threadsId: threads.threadId
           })
         })
     
@@ -57,6 +58,7 @@ export default class ReadAndWriteFile{
 
 parentPort.on('message', (message) => {
   let totalFiles = 0;
+  const info = [];
   message.forEach((item) => {
     totalFiles++;
     const worker = new ReadAndWriteFile()
@@ -64,8 +66,9 @@ parentPort.on('message', (message) => {
     worker.readFile(item)
       .then((data) => {
         totalFiles--;
-        console.log(data);
+        info.push(data);
         if (totalFiles === 0) {
+          parentPort.postMessage(info)
           setTimeout(process.exit, 200)
         }
       })
@@ -74,6 +77,3 @@ parentPort.on('message', (message) => {
       })
    });
 })
-
-
-
