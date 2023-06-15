@@ -75,10 +75,11 @@ class WorkerThreads {
        try{
          for (let i = 0; i < data.threads.length; i++) {
            const worker = data.threads[i];
-           activeWorkers++;
            worker.on('online', () => {
-             worker.postMessage(data.filesForThread[i])
+             worker.postMessage(data.filesForThread[i]);
+             activeWorkers++;
            })
+
          }
 
          resolve();

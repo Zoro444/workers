@@ -3,7 +3,6 @@ import path from "path";
 import fs from "fs";
 import csv from "csv-parser";
 
-
 export default class ReadAndWriteFile{
   readFile(file) {
     return new Promise((resolve, reject) => {
@@ -59,17 +58,19 @@ export default class ReadAndWriteFile{
 parentPort.on('message', (message) => {
   let totalFiles = 0;
   const info = [];
+ if (message.length === 0) {
+  process.exit()
+ }
   message.forEach((item) => {
     totalFiles++;
     const worker = new ReadAndWriteFile()
-
     worker.readFile(item)
       .then((data) => {
         totalFiles--;
         info.push(data);
         if (totalFiles === 0) {
-          parentPort.postMessage(info)
-          setTimeout(process.exit, 200)
+          parentPort.postMessage(info);
+          setTimeout(process.exit, 200);
         }
       })
       .catch((err) => {
