@@ -1,10 +1,12 @@
-import worker, { Worker } from "worker_threads";
+import workers, { Worker } from "worker_threads";
 import fs from "fs";
 import path from "path";
 import os from "os";
 
 let csvFiles ;
 const countCPUs = os.cpus().length;
+const totalInfo = [];
+let activeWorkers = 0;
 
 class WorkerThreads {
     getCsvFiles(dirPath) {
@@ -73,7 +75,7 @@ class WorkerThreads {
        try{
          for (let i = 0; i < data.threads.length; i++) {
            const worker = data.threads[i];
-
+           activeWorkers++;
            worker.on('online', () => {
              worker.postMessage(data.filesForThread[i])
            })
@@ -87,6 +89,7 @@ class WorkerThreads {
     }
 }
 
+
 const workerInstance = new WorkerThreads();
 
 const csvFilesName = workerInstance.getCsvFiles('./csv-files');
@@ -98,7 +101,18 @@ csvFilesName
      workerInstance.createThreads(csvFiles)
        .then((data) => {
          workerInstance.sendFilesToThreads(data);
-         console.log(data.threads.length);
+         data.threads.forEach((thread) => {
+          thread.on('message', (info) => {
+            totalInfo.push(info);
+            activeWorkers--;
+            if (activeWorkers === 0) {
+              console.table(totalInfo);
+              totalInfo.forEach((item) => {
+                console.table(item.files)
+              })
+            }
+          })
+         })
        })
        .catch((err) => {
           console.log(err);
