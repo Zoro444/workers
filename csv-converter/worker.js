@@ -4,15 +4,15 @@ import fs from "fs";
 import csv from "csv-parser";
 
  class ReadAndWriteFile{
-  readFile(file) {
+  readFile(file) {console.log(file);
     return new Promise((resolve, reject) => {
       try {
         const jsonFile = path.basename(file, path.extname(file)) + ".json";
-        const fileName = path.join(path.dirname(file), 'converted', jsonFile);
+        const fileName = path.join( path.dirname(path.resolve()), "workers", 'converted', jsonFile);
 
         const readablyStream = fs.createReadStream(file);
         const writableStream = fs.createWriteStream(fileName);
- 
+
         let duration;
         let start;
         let records = 0;

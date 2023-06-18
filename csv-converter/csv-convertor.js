@@ -30,7 +30,7 @@ class WorkerThreads {
     }
   }
 
-  createThreads(csvFiles) {
+  createThreads(csvFiles, filePath) {
     const filesForThread = Array.from(
       { length: csvFiles.length },
       () => []
@@ -39,12 +39,12 @@ class WorkerThreads {
 
     for (let i = 0; i < csvFiles.length; i++) {
       filesForThread[i].push(
-        path.join(path.resolve(), "csv-files", csvFiles[i])
-      );
+        path.join(filePath, csvFiles[i]));
+      ;
     }
 
     for (let i = 0; i < csvFiles.length; i++) {
-      const worker = new Worker(path.resolve( "worker.js"));
+      const worker = new Worker(path.join(path.resolve(), "csv-converter", "worker.js"));
       threads.push(worker);
     }
 
@@ -64,9 +64,9 @@ class WorkerThreads {
   async start(csvFilePath) {
     try {
       const csvFiles = await this.getCsvFiles(csvFilePath);
-      await this.createDirectory("csv-files/converted");
+      await this.createDirectory(path.resolve("converted"));
 
-      const data = this.createThreads(csvFiles);
+      const data = this.createThreads(csvFiles, csvFilePath);
 
       await this.sendFilesToThreads(data);
 
