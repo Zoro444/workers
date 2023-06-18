@@ -11,8 +11,8 @@ This project is a multi-process CSV to JSON converter implemented in Node.js. It
 
 ## Prerequisites
 
-- Node.js (version X.X.X or higher)
-- npm (version X.X.X or higher)
+- Node.js (version 18.16.0 or higher)
+
 
 ## Installation
 

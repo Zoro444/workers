@@ -89,13 +89,3 @@ class WorkerThreads {
 }
 
 export default WorkerThreads;
-
-
-const workerInstance = new WorkerThreads();
-workerInstance.start("csv-files")
-  .then((data) => {
-    console.log(data);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
