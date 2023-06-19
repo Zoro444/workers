@@ -22,7 +22,7 @@ export default  function(req, res, url) {
       else if (url[0]) {
         getSpecificData(url[0])
         .then((data) => {
-          res.writeHead(200, {'Content-Type': 'text/plain'});
+          res.writeHead(200, {'Content-Type': 'application/json'});
           res.write(`${JSON.stringify(data)}`);
           res.end();        
         })
@@ -66,7 +66,7 @@ async function getConvertedJSONFiles(filename) {
   })
 }
 
-async function getSpecificData(fileName) {
+function getSpecificData(fileName) {
   return new Promise(async (resolve, reject) => {
     try {
       const jsonFile = await fs.promises.readFile(path.join('converted', fileName));
@@ -79,7 +79,7 @@ async function getSpecificData(fileName) {
   })
 }
 
-async function deleteJsonFile(jsonFile) {
+function deleteJsonFile(jsonFile) {
   return new Promise(async (resolve, reject) => {
     try {
       await fs.promises.unlink(path.join('converted', jsonFile))

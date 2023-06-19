@@ -30,7 +30,7 @@ function csvConverter(req, res) {
           filesName.push(item[0].fileName)
         });
 
-        res.writeHead(201, {'Content-Type': 'text/plain'});
+        res.writeHead(201, {'Content-Type': 'application/json'});
         res.write(`${JSON.stringify(filesName)} csv files successfully converted!`);
         res.end();
       })

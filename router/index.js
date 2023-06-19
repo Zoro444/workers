@@ -3,7 +3,7 @@ import files from "./files.js";
 
 export default function(req, res) {
   const url = req.url.split('/');
-console.log(url);
+
   switch (url[1]) {
     case 'exports': 
       exports(req, res, url.slice(2))
@@ -13,8 +13,7 @@ console.log(url);
       break
     default:
       res.writeHead(404, {'Content-Type': 'text/plain'});
-      res.write('404');
-  
+      res.write('page not found!');
       res.end();
     }
 }
