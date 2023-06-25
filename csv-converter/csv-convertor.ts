@@ -3,13 +3,17 @@ import fs from "fs";
 import path from "path";
 
 class WorkerThreads {
+  private csvFiles: string[];
+  private totalInfo: any[];
+  private activeWorkers: number;
+
   constructor() {
     this.csvFiles = [];
     this.totalInfo = [];
     this.activeWorkers = 0;
   }
 
-  async getCsvFiles(dirPath) {
+  async getCsvFiles(dirPath: string): Promise<string[]> {
     try {
       await fs.promises.stat(dirPath);
       const files = await fs.promises.readdir(dirPath);
@@ -20,7 +24,7 @@ class WorkerThreads {
     }
   }
 
-  async createDirectory(dirPath) {
+  async createDirectory(dirPath: string): Promise<string> {
     try {
       await fs.promises.access(dirPath);
       return "Directory exists!";
@@ -30,38 +34,33 @@ class WorkerThreads {
     }
   }
 
-  createThreads(csvFiles, filePath) {
-    const filesForThread = Array.from(
-      { length: csvFiles.length },
-      () => []
-    );
-    const threads = [];
+  createThreads(csvFiles: string[], filePath: string): { threads: Worker[]; filesForThread: string[][] } {
+    const filesForThread: string[][] = Array.from({ length: csvFiles.length }, () => []);
+    const threads: Worker[] = [];
 
     for (let i = 0; i < csvFiles.length; i++) {
-      filesForThread[i].push(
-        path.join(filePath, csvFiles[i]));
-      ;
+      filesForThread[i].push(path.join(filePath, csvFiles[i]));
     }
 
     for (let i = 0; i < csvFiles.length; i++) {
-      const worker = new Worker(path.join(path.resolve(), "csv-converter", "worker.js"));
+      const worker = new Worker(path.join(path.resolve(), "csv-converter", "worker.mjs"));
       threads.push(worker);
     }
 
     return { threads, filesForThread };
   }
 
-  async sendFilesToThreads(data) {
+  async sendFilesToThreads(data: { threads: Worker[]; filesForThread: string[][] }) {
     for (let i = 0; i < data.threads.length; i++) {
-      const worker = data.threads[i]; 
+      const worker = data.threads[i];
       worker.on("online", () => {
         worker.postMessage(data.filesForThread[i]);
-        this.activeWorkers++;   
-      });   
+        this.activeWorkers++;
+      });
     }
   }
 
-  async start(csvFilePath) {
+  async start(csvFilePath: string): Promise<any[]> {
     try {
       const csvFiles = await this.getCsvFiles(csvFilePath);
       await this.createDirectory(path.resolve("converted"));
@@ -70,18 +69,17 @@ class WorkerThreads {
 
       await this.sendFilesToThreads(data);
 
-      return new Promise((resolve, reject) => { 
-        for(let i = 0; i < data.threads.length; i++) {
+      return new Promise((resolve, reject) => {
+        for (let i = 0; i < data.threads.length; i++) {
           data.threads[i].on("message", (info) => {
             this.totalInfo.push(info);
             this.activeWorkers--;
             if (this.activeWorkers === 0) {
               resolve(this.totalInfo);
             }
-          })
+          });
         }
-      })
-      
+      });
     } catch (err) {
       throw err;
     }
