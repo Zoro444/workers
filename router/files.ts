@@ -20,17 +20,17 @@ export default function(req: IncomingMessage, res: ServerResponse, url: string[]
             res.end();
           });
       } else if (url[0]) {
-        getSpecificData(url[0])
-          .then((data) => {
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.write(`${JSON.stringify(data)}`);
-            res.end();
-          })
-          .catch((err) => {
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
-            res.write(`no such file!`);
-            res.end();
-          });
+          getSpecificData(url[0])
+            .then((data) => {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.write(`${JSON.stringify(data)}`);
+              res.end();
+            })
+            .catch((err) => {
+              res.writeHead(404, { 'Content-Type': 'text/plain' });
+              res.write(`no such file!`);
+              res.end();
+            });
       }
       break;
     case "DELETE":

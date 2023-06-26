@@ -6,7 +6,7 @@ import csv from "csv-parser";
  class ReadAndWriteFile{
   readFile(file) {console.log(file);
     return new Promise((resolve, reject) => {
-      try {console.log('here');
+      try {
         const jsonFile = path.basename(file, path.extname(file)) + ".json";
         const fileName = path.join( path.dirname(path.resolve()), "workers", 'converted', jsonFile);
 
@@ -37,7 +37,7 @@ import csv from "csv-parser";
         .on('end', () => {
             duration = new Date - start;
             writableStream.write(']')
-        })
+        });
 
         readablyStream.on('close', () => {
           resolve({
@@ -46,7 +46,7 @@ import csv from "csv-parser";
             records: records + " lines",
             threadsId: threads.threadId
           })
-        })
+        });
     
       }catch(err) {
         reject(err);
