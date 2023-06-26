@@ -5,7 +5,7 @@ export default function (req: IncomingMessage, res: ServerResponse) {
   const method: string | undefined = req.method;
 
   switch (method) {
-    case "POST":
+    case "POST":   
       csvConverter(req, res);
       break;
     default:
@@ -27,14 +27,10 @@ function csvConverter(req: IncomingMessage, res: ServerResponse) {
     csvConvert
       .start(body[0].directoryPath)
       .then((data: { fileName: string }[]) => {
-        const filesName: string[] = [];
-        data.forEach((item) => {
-          filesName.push(item.fileName);
-        });
-
+  
         res.writeHead(201, { "Content-Type": "application/json" });
         res.write(
-          `${JSON.stringify(filesName)} csv files successfully converted!`
+          `csv files successfully converted!`
         );
         res.end();
       })

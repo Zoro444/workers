@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import router from "./router/index";
 
 dotenv.config();
-const port = process?.env.PORT;
+const port = process?.env.PORT ?? "3000";
 
 const server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
   router(req, res);

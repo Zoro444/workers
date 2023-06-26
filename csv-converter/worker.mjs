@@ -6,7 +6,7 @@ import csv from "csv-parser";
  class ReadAndWriteFile{
   readFile(file) {console.log(file);
     return new Promise((resolve, reject) => {
-      try {
+      try {console.log('here');
         const jsonFile = path.basename(file, path.extname(file)) + ".json";
         const fileName = path.join( path.dirname(path.resolve()), "workers", 'converted', jsonFile);
 
